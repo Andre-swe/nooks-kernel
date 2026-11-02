@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nooks.place/schema/spatial-asset.schema.json",
+  "title": "Nooks spatial asset (object version)",
+  "description": "One immutable version of a Nooks object: what it is, where it came from, what was observed versus inferred, and what may be done with it.",
+  "type": "object",
+  "required": ["id", "version", "name", "createdAt", "contributors", "representations", "provenance", "evidence", "rights"],
+  "additionalProperties": false,
+  "properties": {
+    "id": { "type": "string", "pattern": "^nook:obj/[0-9a-f]{8,64}$", "description": "Content-derived object id." },
+    "version": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "forkedFrom": { "type": "string", "pattern": "^nook:obj/[0-9a-f]{8,64}@[0-9]+$", "description": "Object@version this one was remixed from." },
+    "contributors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["account", "role"],
+        "additionalProperties": false,
+        "properties": {
+          "account": { "type": "string", "description": "Nooks account id or a wallet address." },
+          "role": { "enum": ["creator", "editor", "verifier", "archivist", "agent"] },
+          "share": { "type": "number", "minimum": 0, "maximum": 1, "description": "Attribution weight used by payouts; shares across contributors sum to 1." }
+        }
+      }
+    },
+    "location": {
+      "type": "object",
+      "description": "Present when the object represents a real place or thing at a place.",
+      "required": ["lat", "lon"],
+      "additionalProperties": false,
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lon": { "type": "number", "minimum": -180, "maximum": 180 },
+        "osm": { "type": "string", "pattern": "^(node|way|relation)/[0-9]+$" },
+        "worldPlacement": { "type": "string", "description": "Placement id inside a Nooks World." }
+      }
+    },
+    "representations": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "properties": {
+        "voxels": { "$ref": "#/$defs/blob" },
+        "mesh": { "$ref": "#/$defs/blob" },
+        "parts": {
+          "type": "object",
+          "required": ["blob", "pieces", "designs", "valid"],
+          "additionalProperties": false,
+          "properties": {
+            "blob": { "$ref": "#/$defs/blob" },
+            "format": { "enum": ["nooks-model-json", "ldraw"] },
+            "pieces": { "type": "integer", "minimum": 0 },
+            "designs": { "type": "integer", "minimum": 0 },
+            "valid": { "type": "boolean", "description": "Every part connects to the base through stud connections." },
+            "recoloured": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "render": { "$ref": "#/$defs/blob" }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["generator", "kernelVersion", "inputs"],
+      "additionalProperties": false,
+      "properties": {
+        "generator": { "type": "string", "examples": ["nooks-create-proto", "studio", "arnis"] },
+        "kernelVersion": { "type": "string" },
+        "mode": { "enum": ["relief", "mosaic", "mesh", "world", "manual"] },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["kind", "hash"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "enum": ["photo", "mesh", "osm", "archive", "world-model", "capture", "previous-version"] },
+              "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+              "licence": { "type": "string" },
+              "source": { "type": "string", "description": "Where the input came from, e.g. a URL or archive reference." }
+            }
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "description": "Element or section name → how it is known.",
+      "additionalProperties": { "enum": ["observed", "expert", "ai-inference", "interpretation", "disputed"] }
+    },
+    "rights": {
+      "type": "object",
+      "required": ["licence", "commercial", "trainingUse"],
+      "additionalProperties": false,
+      "properties": {
+        "licence": { "type": "string", "examples": ["CC-BY-4.0", "CC-BY-NC-4.0", "all-rights-reserved"] },
+        "commercial": { "type": "boolean" },
+        "trainingUse": { "enum": ["opt-in", "opt-out", "research-only"] },
+        "attribution": { "type": "string" }
+      }
+    },
+    "usages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["kind", "ref", "at"],
+        "additionalProperties": false,
+        "properties": {
+          "kind": { "enum": ["world", "experience", "kit", "dataset", "license", "remix"] },
+          "ref": { "type": "string" },
+          "at": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "blob": {
+      "type": "object",
+      "required": ["hash", "bytes"],
+      "additionalProperties": false,
+      "properties": {
+        "hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "bytes": { "type": "integer", "minimum": 0 },
+        "mime": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+Nooks Kernel
+Copyright 2026 Nooks contributors
+
+This distribution excludes third-party runtime geometry, reference data, and service code.
+Any third-party material added to a redistribution retains its own licence and notice.
+
+The part-and-colour availability catalogue is derived from Rebrickable download data;
+its source and build date are retained in data/catalog/catalog.json. It is not relicensed.

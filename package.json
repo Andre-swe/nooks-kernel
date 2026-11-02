@@ -1,0 +1,25 @@
+{
+  "name": "@nooks/kernel",
+  "version": "0.1.0",
+  "description": "Deterministic, pure construction kernel and public data schemas for Nooks.",
+  "type": "module",
+  "exports": {
+    "./voxels": "./src/voxels.mjs",
+    "./palette": "./src/palette.mjs",
+    "./parts": "./src/parts.mjs",
+    "./decompose": "./src/decompose.mjs",
+    "./validate": "./src/validate.mjs",
+    "./benchmark": "./src/benchmark.mjs",
+    "./brainflakes": "./src/brainflakes.mjs",
+    "./agent-connection": "./src/agent-connection.mjs",
+    "./runtime-guide": "./src/runtime-guide.mjs",
+    "./schema/spatial-asset": "./schema/spatial-asset.schema.json"
+  },
+  "files": ["src", "schema", "data/catalog/catalog.json", "LICENSE", "NOTICE", "README.md"],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "audit:release": "node scripts/audit-release.mjs"
+  },
+  "engines": { "node": ">=22" },
+  "license": "Apache-2.0"
+}
